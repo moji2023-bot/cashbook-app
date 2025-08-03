@@ -1,0 +1,71 @@
+function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let y = 12;
+
+    // Main Title
+    doc.setFontSize(16);
+    doc.text("Trade Payables & Receivables Report", 105, y, {align: "center"});
+    y += 8;
+
+    // Date of Report
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text("Statement generated: " + new Date().toLocaleString(), 105, y, {align: "center"});
+    y += 8;
+
+    // --- Summary Table ---
+    doc.setFontSize(12);
+    doc.setTextColor(40,40,40);
+    doc.text("Individual Summary", 14, y);
+    y += 5;
+
+    const summaryData = [];
+    Object.keys(data.openings).forEach(name => {
+      let s = { opening: data.openings[name], received: 0, paid: 0, balance: data.openings[name] };
+      data.entries.forEach(entry => {
+        if(entry.name === name) {
+          if (entry.type === "Receivable") { s.received += entry.amount; s.balance -= entry.amount; }
+          else { s.paid += entry.amount; s.balance += entry.amount; }
+        }
+      });
+      summaryData.push([
+        name,
+        s.opening.toFixed(2),
+        s.received.toFixed(2),
+        s.paid.toFixed(2),
+        (s.balance <= 0 ? "+" : "-") + "₹" + Math.abs(s.balance).toFixed(2)
+      ]);
+    });
+
+    doc.autoTable({
+      startY: y,
+      head: [['Name', 'Opening', 'Received', 'Paid', 'Balance']],
+      body: summaryData.length > 0 ? summaryData : [['(none)', '', '', '', '']],
+      theme: 'grid',
+      headStyles: { fillColor: [60,141,188] },
+      styles: { halign: 'center' }
+    });
+    y = doc.lastAutoTable.finalY + 8;
+
+    // --- All Entries Table ---
+    doc.setFontSize(12);
+    doc.setTextColor(40,40,40);
+    doc.text("All Entries", 14, y);
+    y += 2;
+
+    const entryRows = data.entries.map(e => [
+      e.timestamp || "",
+      e.name,
+      e.type,
+      "₹" + e.amount.toFixed(2)
+    ]);
+
+    doc.autoTable({
+      startY: y + 3,
+      head: [['Date & Time', 'Name', 'Type', 'Amount']],
+      body: entryRows.length > 0 ? entryRows : [['(no entries yet)', '', '', '']],
+      styles: { fontSize:10, cellPadding: 1 }
+    });
+    doc.save('TradeBook_Report.pdf');
+}
