@@ -13,6 +13,7 @@ function exportPDF() {
     doc.setTextColor(100);
     doc.text("Statement generated: " + new Date().toLocaleString(), 105, y, {align: "center"});
     y += 8;
+
     // --- Summary Table ---
     doc.setFontSize(12);
     doc.setTextColor(40,40,40);
