@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Cash Book</title>
+</head>
+<body>
+  <h2>Cash Book</h2>
+  <form id="entryForm">
+    Name: <input type="text" id="name"><br>
+    Amount: <input type="number" id="amount"><br>
+    Type: 
+      <select id="type">
+        <option value="Received">Received</option>
+        <option value="Paid">Paid</option>
+      </select><br>
+    <button type="button" onclick="addEntry()">Add</button>
+  </form>
+  <h3>Records</h3>
+  <ul id="records"></ul>
+
+  <script>
+    function addEntry() {
+      var name = document.getElementById('name').value;
+      var amount = document.getElementById('amount').value;
+      var type = document.getElementById('type').value;
+      var entry = name + ' - ' + type + ' - ₹' + amount;
+      var list = document.getElementById('records');
+      var item = document.createElement('li');
+      item.textContent = entry;
+      list.appendChild(item);
+      document.getElementById('entryForm').reset();
+    }
+  </script>
+</body>
+</html>
